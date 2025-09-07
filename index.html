@@ -147,11 +147,73 @@
       <h3 class="text-xl font-bold mb-4">Contáctanos</h3>
       <p>Email: info@migrarfacil.com</p>
       <p>Tel: +52 555 123 4567</p>
-      <p>© 2024 MigrarFácil. Todos los derechos reservados.</p>
+      <p>&copy; 2024 MigrarFácil. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <script>
+  <!-- Firebase Modular SDK Integration -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyBnyO_ONmEitB2-fqI9_kA2B_8XkFexrqA",
+      authDomain: "migrarseguro-b7f9e.firebaseapp.com",
+      projectId: "migrarseguro-b7f9e",
+      storageBucket: "migrarseguro-b7f9e.firebasestorage.app",
+      messagingSenderId: "1001520721318",
+      appId: "1:1001520721318:web:c6cc19e086d82a29913367",
+      measurementId: "G-8BHSR3E99T"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Referencia a la colección 'appointments'
+    const appointmentsCol = collection(db, "appointments");
+
+    // Formulario y mensaje éxito
+    const form = document.getElementById("appointmentForm");
+    const successMessage = document.getElementById("successMessage");
+    const dateInput = document.querySelector('input[name="date"]');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name').trim(),
+        email: formData.get('email').trim(),
+        phone: formData.get('phone').trim(),
+        service: formData.get('service'),
+        date: formData.get('date'),
+        message: formData.get('message').trim(),
+        createdAt: serverTimestamp()
+      };
+
+      try {
+        await addDoc(appointmentsCol, data);
+        successMessage.classList.remove('hidden');
+        form.reset();
+        dateInput.min = today; // reset min date
+        setTimeout(() => successMessage.classList.add('hidden'), 5000);
+      } catch (error) {
+        alert('Error al enviar solicitud. Intenta de nuevo.');
+        console.error(error);
+      }
+    });
+
     // Simple mobile menu toggle (if needed)
     const menuBtn = document.getElementById('menu-btn');
     if (menuBtn) {
@@ -159,21 +221,6 @@
         alert('Aqui se implementaria el toggle del menu mobile');
       });
     }
-
-    // Set min date
-    const dateInput = document.querySelector('input[name="date"]');
-    dateInput.min = new Date().toISOString().split('T')[0];
-
-    // Form submission
-    const form = document.getElementById('appointmentForm');
-    const success = document.getElementById('successMessage');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      // Simulacion de envio (reemplaza con real Firebase)
-      success.classList.remove('hidden');
-      form.reset();
-      setTimeout(() => success.classList.add('hidden'), 5000);
-    });
   </script>
 </body>
 </html>
